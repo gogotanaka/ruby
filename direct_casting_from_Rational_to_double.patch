@@ -1,0 +1,51 @@
+From 5852a688765ac88e146555a3f023299097cbc717 Mon Sep 17 00:00:00 2001
+From: gogotanaka <mail@tanakakazuki.com>
+Date: Thu, 26 Feb 2015 21:16:06 +0900
+Subject: [PATCH 1/2] Direct casting from Rational to double.
+To: https://bugs.ruby-lang.org/
+
+---
+ math.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/math.c b/math.c
+index 5d4c2bb..fc03b5b 100644
+--- a/math.c
++++ b/math.c
+@@ -32,13 +32,20 @@ basic_to_f_p(VALUE klass)
+     return rb_method_basic_definition_p(klass, id_to_f);
+ }
+
++#define fix2dbl_without_to_f(x) (double)FIX2LONG(x)
++#define big2dbl_without_to_f(x) rb_big2dbl(x)
++#define int2dbl_without_to_f(x) (FIXNUM_P(x) ? fix2dbl_without_to_f(x) : big2dbl_without_to_f(x))
++#define rat2dbl_without_to_f(x) \
++    (int2dbl_without_to_f(rb_rational_num(x)) / \
++     int2dbl_without_to_f(rb_rational_den(x)))
++
+ static inline double
+ num2dbl_with_to_f(VALUE num)
+ {
+     if (SPECIAL_CONST_P(num)) {
+ 	if (FIXNUM_P(num)) {
+ 	    if (basic_to_f_p(rb_cFixnum))
+-		return (double)FIX2LONG(num);
++		return fix2dbl_without_to_f(num);
+ 	}
+ 	else if (FLONUM_P(num)) {
+ 	    return RFLOAT_VALUE(num);
+@@ -50,7 +57,11 @@ num2dbl_with_to_f(VALUE num)
+ 	    return RFLOAT_VALUE(num);
+ 	  case T_BIGNUM:
+ 	    if (basic_to_f_p(rb_cBignum))
+-		return rb_big2dbl(num);
++		return big2dbl_without_to_f(num);
++	    break;
++	  case T_RATIONAL:
++	    if (basic_to_f_p(rb_cRational))
++		return rat2dbl_without_to_f(num);
+ 	    break;
+ 	}
+     }
+--
+gogotanaka
