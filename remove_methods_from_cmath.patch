@@ -1,0 +1,335 @@
+From b0a8c96d9dd7624e2ecb7d137ff83f8fd87d041f Mon Sep 17 00:00:00 2001
+From: gogotanaka <mail@tanakakazuki.com>
+Date: Sun, 15 Mar 2015 00:58:35 -0700
+Subject: [PATCH 1/2] Remove methods from CMath
+To: https://bugs.ruby-lang.org/
+
+---
+ lib/cmath.rb | 111 ++++++++++++++++++-----------------------------------------
+ 1 file changed, 34 insertions(+), 77 deletions(-)
+
+diff --git a/lib/cmath.rb b/lib/cmath.rb
+index e0c9139..2669fda 100644
+--- a/lib/cmath.rb
++++ b/lib/cmath.rb
+@@ -17,30 +17,6 @@ module CMath
+ 
+   include Math
+ 
+-  alias exp! exp
+-  alias log! log
+-  alias log2! log2
+-  alias log10! log10
+-  alias sqrt! sqrt
+-  alias cbrt! cbrt
+-
+-  alias sin! sin
+-  alias cos! cos
+-  alias tan! tan
+-
+-  alias sinh! sinh
+-  alias cosh! cosh
+-  alias tanh! tanh
+-
+-  alias asin! asin
+-  alias acos! acos
+-  alias atan! atan
+-  alias atan2! atan2
+-
+-  alias asinh! asinh
+-  alias acosh! acosh
+-  alias atanh! atanh
+-
+   ##
+   # Math::E raised to the +z+ power
+   #
+@@ -50,11 +26,11 @@ module CMath
+   def exp(z)
+     begin
+       if z.real?
+-        exp!(z)
++        Math.exp(z)
+       else
+-        ere = exp!(z.real)
+-        Complex(ere * cos!(z.imag),
+-                ere * sin!(z.imag))
++        ere = Math.exp(z.real)
++        Complex(ere * Math.cos(z.imag),
++                ere * Math.sin(z.imag))
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -69,9 +45,9 @@ module CMath
+   def log(z, b=::Math::E)
+     begin
+       if z.real? && z >= 0 && b >= 0
+-        log!(z, b)
++        Math.log(z, b)
+       else
+-        Complex(log!(z.abs), z.arg) / log(b)
++        Complex(Math.log(z.abs), z.arg) / log(b)
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -83,9 +59,9 @@ module CMath
+   def log2(z)
+     begin
+       if z.real? and z >= 0
+-        log2!(z)
++        Math.log2(z)
+       else
+-        log(z) / log!(2)
++        log(z) / Math.log(2)
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -97,9 +73,9 @@ module CMath
+   def log10(z)
+     begin
+       if z.real? and z >= 0
+-        log10!(z)
++        Math.log10(z)
+       else
+-        log(z) / log!(10)
++        log(z) / Math.log(10)
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -115,9 +91,9 @@ module CMath
+     begin
+       if z.real?
+         if z < 0
+-          Complex(0, sqrt!(-z))
++          Complex(0, Math.sqrt(-z))
+         else
+-          sqrt!(z)
++          Math.sqrt(z)
+         end
+       else
+         if z.imag < 0 ||
+@@ -126,7 +102,7 @@ module CMath
+         else
+           r = z.abs
+           x = z.real
+-          Complex(sqrt!((r + x) / 2.0), sqrt!((r - x) / 2.0))
++          Complex(Math.sqrt((r + x) / 2.0), Math.sqrt((r - x) / 2.0))
+         end
+       end
+     rescue NoMethodError
+@@ -145,10 +121,10 @@ module CMath
+   def sin(z)
+     begin
+       if z.real?
+-        sin!(z)
++        Math.sin(z)
+       else
+-        Complex(sin!(z.real) * cosh!(z.imag),
+-                cos!(z.real) * sinh!(z.imag))
++        Complex(Math.sin(z.real) * Math.cosh(z.imag),
++                Math.cos(z.real) * Math.sinh(z.imag))
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -160,10 +136,10 @@ module CMath
+   def cos(z)
+     begin
+       if z.real?
+-        cos!(z)
++        Math.cos(z)
+       else
+-        Complex(cos!(z.real) * cosh!(z.imag),
+-                -sin!(z.real) * sinh!(z.imag))
++        Complex(Math.cos(z.real) * Math.cosh(z.imag),
++                -Math.sin(z.real) * Math.sinh(z.imag))
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -175,7 +151,7 @@ module CMath
+   def tan(z)
+     begin
+       if z.real?
+-        tan!(z)
++        Math.tan(z)
+       else
+         sin(z) / cos(z)
+       end
+@@ -189,10 +165,10 @@ module CMath
+   def sinh(z)
+     begin
+       if z.real?
+-        sinh!(z)
++        Math.sinh(z)
+       else
+-        Complex(sinh!(z.real) * cos!(z.imag),
+-                cosh!(z.real) * sin!(z.imag))
++        Complex(Math.sinh(z.real) * Math.cos(z.imag),
++                Math.cosh(z.real) * Math.sin(z.imag))
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -204,10 +180,10 @@ module CMath
+   def cosh(z)
+     begin
+       if z.real?
+-        cosh!(z)
++        Math.cosh(z)
+       else
+-        Complex(cosh!(z.real) * cos!(z.imag),
+-                sinh!(z.real) * sin!(z.imag))
++        Complex(Math.cosh(z.real) * Math.cos(z.imag),
++                Math.sinh(z.real) * Math.sin(z.imag))
+       end
+     rescue NoMethodError
+       handle_no_method_error
+@@ -219,7 +195,7 @@ module CMath
+   def tanh(z)
+     begin
+       if z.real?
+-        tanh!(z)
++        Math.tanh(z)
+       else
+         sinh(z) / cosh(z)
+       end
+@@ -233,7 +209,7 @@ module CMath
+   def asin(z)
+     begin
+       if z.real? and z >= -1 and z <= 1
+-        asin!(z)
++        Math.asin(z)
+       else
+         (-1.0).i * log(1.0.i * z + sqrt(1.0 - z * z))
+       end
+@@ -247,7 +223,7 @@ module CMath
+   def acos(z)
+     begin
+       if z.real? and z >= -1 and z <= 1
+-        acos!(z)
++        Math.acos(z)
+       else
+         (-1.0).i * log(z + 1.0.i * sqrt(1.0 - z * z))
+       end
+@@ -261,7 +237,7 @@ module CMath
+   def atan(z)
+     begin
+       if z.real?
+-        atan!(z)
++        Math.atan(z)
+       else
+         1.0.i * log((1.0.i + z) / (1.0.i - z)) / 2.0
+       end
+@@ -276,7 +252,7 @@ module CMath
+   def atan2(y,x)
+     begin
+       if y.real? and x.real?
+-        atan2!(y,x)
++        Math.atan2(y,x)
+       else
+         (-1.0).i * log((x + 1.0.i * y) / sqrt(x * x + y * y))
+       end
+@@ -290,7 +266,7 @@ module CMath
+   def asinh(z)
+     begin
+       if z.real?
+-        asinh!(z)
++        Math.asinh(z)
+       else
+         log(z + sqrt(1.0 + z * z))
+       end
+@@ -304,7 +280,7 @@ module CMath
+   def acosh(z)
+     begin
+       if z.real? and z >= 1
+-        acosh!(z)
++        Math.acosh(z)
+       else
+         log(z + sqrt(z * z - 1.0))
+       end
+@@ -318,7 +294,7 @@ module CMath
+   def atanh(z)
+     begin
+       if z.real? and z >= -1 and z <= 1
+-        atanh!(z)
++        Math.atanh(z)
+       else
+         log((1.0 + z) / (1.0 - z)) / 2.0
+       end
+@@ -327,47 +303,28 @@ module CMath
+     end
+   end
+ 
+-  module_function :exp!
+   module_function :exp
+-  module_function :log!
+   module_function :log
+-  module_function :log2!
+   module_function :log2
+-  module_function :log10!
+   module_function :log10
+-  module_function :sqrt!
+   module_function :sqrt
+-  module_function :cbrt!
+   module_function :cbrt
+ 
+-  module_function :sin!
+   module_function :sin
+-  module_function :cos!
+   module_function :cos
+-  module_function :tan!
+   module_function :tan
+ 
+-  module_function :sinh!
+   module_function :sinh
+-  module_function :cosh!
+   module_function :cosh
+-  module_function :tanh!
+   module_function :tanh
+ 
+-  module_function :asin!
+   module_function :asin
+-  module_function :acos!
+   module_function :acos
+-  module_function :atan!
+   module_function :atan
+-  module_function :atan2!
+   module_function :atan2
+ 
+-  module_function :asinh!
+   module_function :asinh
+-  module_function :acosh!
+   module_function :acosh
+-  module_function :atanh!
+   module_function :atanh
+ 
+   module_function :frexp
+-- 
+gogotanaka
+
+
+From 24aa021e7916037e1eddf2a3b5489b308690601e Mon Sep 17 00:00:00 2001
+From: gogotanaka <mail@tanakakazuki.com>
+Date: Sun, 15 Mar 2015 01:23:31 -0700
+Subject: [PATCH 2/2] Add tests
+To: https://bugs.ruby-lang.org/
+
+---
+ test/ruby/test_complex.rb | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/test/ruby/test_complex.rb b/test/ruby/test_complex.rb
+index beccc8e..b2965ee 100644
+--- a/test/ruby/test_complex.rb
++++ b/test/ruby/test_complex.rb
+@@ -966,6 +966,10 @@ class Complex_Test < Test::Unit::TestCase
+       assert_in_delta(1.092, c.real, 0.001)
+       assert_in_delta(-0.420, c.imag, 0.001)
+ 
++      c = CMath.log2(Complex(1, 2))
++      assert_in_delta(1.160, c.real, 0.001)
++      assert_in_delta(1.597, c.imag, 0.001)
++
+       c = CMath.log10(Complex(1, 2))
+       assert_in_delta(0.349, c.real, 0.001)
+       assert_in_delta(0.480, c.imag, 0.001)
+-- 
+gogotanaka
+
